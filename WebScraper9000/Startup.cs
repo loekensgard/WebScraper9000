@@ -29,6 +29,7 @@ namespace WebScraper9000
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://discord.com/"));
             builder.Services.AddSingleton<IKomplettService, KomplettService>();
             builder.Services.AddSingleton<IElkjopService, ElkjopService>();
+            builder.Services.AddSingleton<IProshopService, ProshopService>();
         }
 
         private string GetBasePath(IFunctionsHostBuilder builder)
