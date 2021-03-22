@@ -11,6 +11,7 @@ namespace WebScraper9000.Configurations
     {
         public string Name { get; set; }
         public string KomplettUrl { get; set; }
+        public string ElkjopUrl { get; set; }
         public string DiscordChannel { get; set; }
     }
 }

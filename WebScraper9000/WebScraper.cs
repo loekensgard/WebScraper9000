@@ -15,12 +15,14 @@ namespace WebScraper9000
     {
         private readonly IDiscordService _discordService;
         private readonly IKomplettService _komplettService;
+        private readonly IElkjopService _powerService;
         private readonly ItemsIWantConfiguration _options;
 
-        public WebScraper(IDiscordService discordService, IKomplettService komplettService, IOptions<ItemsIWantConfiguration> options)
+        public WebScraper(IDiscordService discordService, IKomplettService komplettService, IElkjopService elkjopService, IOptions<ItemsIWantConfiguration> options)
         {
             _discordService = discordService;
             _komplettService = komplettService;
+            _powerService = elkjopService;
             _options = options.Value;
         }
 
@@ -37,7 +39,10 @@ namespace WebScraper9000
                 log.LogInformation("Checking {count} items", _options.Items.Count);
                 foreach (var item in _options.Items)
                 {
-                    list.AddRange(await _komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
+                    if(!string.IsNullOrEmpty(item.KomplettUrl))
+                        list.AddRange(await _komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
+                    if(!string.IsNullOrEmpty(item.ElkjopUrl))
+                        list.AddRange(await _powerService.GetItemInStockFromPower(item.ElkjopUrl, item.Name, item.DiscordChannel));
                 }
             }
 
