@@ -41,7 +41,7 @@ namespace WebScraper9000.Services
                         if (productLink != null)
                         {
                             var hrefValue = productLink.GetAttributeValue("href", string.Empty);
-                            list.Add(new InStockItem { Url = "https://www.proshop.no/" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Proshop.no" });
+                            list.Add(new InStockItem { Url = "https://www.proshop.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Proshop.no" });
                         }
                     }
                 }
