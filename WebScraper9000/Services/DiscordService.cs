@@ -19,7 +19,11 @@ namespace WebScraper9000.Services
         {
             foreach (var item in list)
             {
-                var body = new { username = "GrabIt", content = $"**{item.Count}** {item.Name} in stock at *{item.Store}*: {item.Url}" };
+                var x = "Ukjent antall";
+                if (item.Count != 0)
+                    x = item.Count.ToString();
+
+                var body = new { username = "GrabIt", content = $"**{x}** {item.Name} på lager hos **{item.Store}**: {item.Url}" };
                 var response = await _httpClient.PostAsJsonAsync(item.Channel, body);
 
                 response.EnsureSuccessStatusCode();
