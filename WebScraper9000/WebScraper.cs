@@ -28,11 +28,17 @@ namespace WebScraper9000
         public async Task Run([TimerTrigger("*/30 * * * * *")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation("Worker running at: {time}", DateTime.Now.ToString("d/MM/yy HH:mm"));
+            if (_options.Items == null) log.LogError("No items loaded from settings");
 
             var list = new List<InStockItem>();
-            foreach (var item in _options.Items)
+
+            if(_options.Items != null)
             {
-                list.AddRange(await _komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
+                log.LogInformation("Checking {count} items", _options.Items.Count);
+                foreach (var item in _options.Items)
+                {
+                    list.AddRange(await _komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
+                }
             }
 
             if (list.Any())

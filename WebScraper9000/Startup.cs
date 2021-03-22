@@ -18,7 +18,8 @@ namespace WebScraper9000
         {
             var localConfig = new ConfigurationBuilder()
                 .SetBasePath(GetBasePath(builder))
-                .AddJsonFile("local.settings.json")
+                .AddJsonFile("appsettings.json", true)
+                .AddJsonFile("local.settings.json", true)
                 .AddEnvironmentVariables()
                 .Build();
 
