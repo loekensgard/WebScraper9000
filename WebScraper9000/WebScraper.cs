@@ -38,14 +38,13 @@ namespace WebScraper9000
             log.LogInformation("Worker running at: {time}", DateTime.Now.ToString("d/MM/yy HH:mm"));
             if (_options.Items == null) log.LogError("No items loaded from settings");
 
-            var list = new List<InStockItem>();
+            var tasks = new List<Task<List<InStockItem>>>();
 
             if(_options.Items != null)
             {
                 log.LogInformation("Checking {count} items", _options.Items.Count);
                 foreach (var item in _options.Items)
                 {
-                    var tasks = new List<Task<List<InStockItem>>>();
                     if(!string.IsNullOrEmpty(item.KomplettUrl))
                         tasks.Add(_komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
                     if(!string.IsNullOrEmpty(item.ElkjopUrl))
@@ -56,13 +55,10 @@ namespace WebScraper9000
                         tasks.Add(_multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel));
                     if (!string.IsNullOrEmpty(item.PowerUrl))
                         tasks.Add(_powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel));
-                    
-                    foreach (var result in await Task.WhenAll(tasks))
-                    {
-                        list.AddRange(result);
-                    }
                 }
             }
+
+            var list = (await Task.WhenAll(tasks)).SelectMany(result => result).ToList();
 
             if (list.Any())
             {
