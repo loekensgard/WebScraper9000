@@ -53,8 +53,8 @@ namespace WebScraper9000
                         list.AddRange(await _proshopService.GetItemInStockFromProshop(item.ProshopUrl, item.Name, item.DiscordChannel));
                     if (!string.IsNullOrEmpty(item.MulticomUrl))
                         list.AddRange(await _multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel));
-                    //if (!string.IsNullOrEmpty(item.PowerUrl))
-                    //    list.AddRange(await _powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel));
+                    if (!string.IsNullOrEmpty(item.PowerUrl))
+                       list.AddRange(await _powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel));
                 }
             }
 
