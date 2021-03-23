@@ -45,16 +45,22 @@ namespace WebScraper9000
                 log.LogInformation("Checking {count} items", _options.Items.Count);
                 foreach (var item in _options.Items)
                 {
+                    var tasks = new List<Task<List<InStockItem>>>();
                     if(!string.IsNullOrEmpty(item.KomplettUrl))
-                        list.AddRange(await _komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
+                        tasks.Add(_komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
                     if(!string.IsNullOrEmpty(item.ElkjopUrl))
-                        list.AddRange(await _elkjopService.GetItemInStockFromElkjop(item.ElkjopUrl, item.Name, item.DiscordChannel));
+                        tasks.Add(_elkjopService.GetItemInStockFromElkjop(item.ElkjopUrl, item.Name, item.DiscordChannel));
                     if (!string.IsNullOrEmpty(item.ProshopUrl))
-                        list.AddRange(await _proshopService.GetItemInStockFromProshop(item.ProshopUrl, item.Name, item.DiscordChannel));
+                        tasks.Add(_proshopService.GetItemInStockFromProshop(item.ProshopUrl, item.Name, item.DiscordChannel));
                     if (!string.IsNullOrEmpty(item.MulticomUrl))
-                        list.AddRange(await _multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel));
+                        tasks.Add(_multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel));
                     if (!string.IsNullOrEmpty(item.PowerUrl))
-                       list.AddRange(await _powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel));
+                        tasks.Add(_powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel));
+                    
+                    foreach (var result in await Task.WhenAll(tasks))
+                    {
+                        list.AddRange(result);
+                    }
                 }
             }
 
