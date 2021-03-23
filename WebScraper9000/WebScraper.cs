@@ -18,8 +18,10 @@ namespace WebScraper9000
         private readonly IElkjopService _elkjopService;
         private readonly IProshopService _proshopService;
         private readonly IPowerService _powerService;
+        private readonly IMulticomService _multicomService;
         private readonly ItemsIWantConfiguration _options;
 
+        public WebScraper(IDiscordService discordService, IKomplettService komplettService, IElkjopService elkjopService, IProshopService proshopService, IMulticomService multicomService, IOptions<ItemsIWantConfiguration> options)
         public WebScraper(IDiscordService discordService, IKomplettService komplettService, IElkjopService elkjopService, IProshopService proshopService, IPowerService powerService ,IOptions<ItemsIWantConfiguration> options)
         {
             _discordService = discordService;
@@ -27,6 +29,7 @@ namespace WebScraper9000
             _elkjopService = elkjopService;
             _proshopService = proshopService;
             _powerService = powerService;
+            _multicomService = multicomService;
             _options = options.Value;
         }
 
@@ -43,14 +46,14 @@ namespace WebScraper9000
                 log.LogInformation("Checking {count} items", _options.Items.Count);
                 foreach (var item in _options.Items)
                 {
-                    //if(!string.IsNullOrEmpty(item.KomplettUrl))
-                    //    list.AddRange(await _komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
-                    //if(!string.IsNullOrEmpty(item.ElkjopUrl))
-                    //    list.AddRange(await _elkjopService.GetItemInStockFromElkjop(item.ElkjopUrl, item.Name, item.DiscordChannel));
-                    //if (!string.IsNullOrEmpty(item.ProshopUrl))
-                    //    list.AddRange(await _proshopService.GetItemInStockFromProshop(item.ProshopUrl, item.Name, item.DiscordChannel));
-                    if (!string.IsNullOrEmpty(item.PowerUrl))
-                        list.AddRange(await _powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel));
+                    if(!string.IsNullOrEmpty(item.KomplettUrl))
+                        list.AddRange(await _komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
+                    if(!string.IsNullOrEmpty(item.ElkjopUrl))
+                        list.AddRange(await _powerService.GetItemInStockFromPower(item.ElkjopUrl, item.Name, item.DiscordChannel));
+                    if (!string.IsNullOrEmpty(item.ProshopUrl))
+                        list.AddRange(await _proshopService.GetItemInStockFromProshop(item.ProshopUrl, item.Name, item.DiscordChannel));
+                    if (!string.IsNullOrEmpty(item.MulticomUrl))
+                        list.AddRange(await _multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel));
                 }
             }
 

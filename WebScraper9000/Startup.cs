@@ -31,6 +31,7 @@ namespace WebScraper9000
             builder.Services.AddSingleton<IElkjopService, ElkjopService>();
             builder.Services.AddSingleton<IProshopService, ProshopService>();
             builder.Services.AddSingleton<IPowerService, PowerService>();
+            builder.Services.AddSingleton<IMulticomService, MulticomService>();
         }
 
         private string GetBasePath(IFunctionsHostBuilder builder)

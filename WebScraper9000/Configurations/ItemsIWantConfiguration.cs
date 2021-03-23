@@ -13,6 +13,7 @@ namespace WebScraper9000.Configurations
         public string KomplettUrl { get; set; }
         public string ElkjopUrl { get; set; }
         public string ProshopUrl { get; set; }
+        public string MulticomUrl { get; set; }
         public string DiscordChannel { get; set; }
         public string PowerUrl { get; set; }
     }
