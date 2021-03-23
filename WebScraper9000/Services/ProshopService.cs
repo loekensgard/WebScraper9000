@@ -41,6 +41,8 @@ namespace WebScraper9000.Services
                         if (productLink != null)
                         {
                             var hrefValue = productLink.GetAttributeValue("href", string.Empty);
+                            countN = await GetProshopCount("https://www.proshop.no" + hrefValue);
+
                             list.Add(new InStockItem { Url = "https://www.proshop.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Proshop.no" });
                         }
                     }
@@ -50,5 +52,22 @@ namespace WebScraper9000.Services
             return list;
         }
 
+        private async Task<int> GetProshopCount(string url)
+        {
+            var webCrawler = new HtmlWeb()
+            {
+                AutoDetectEncoding = false,
+                OverrideEncoding = Encoding.UTF8
+            };
+            var doc = await webCrawler.LoadFromWebAsync(url, Encoding.UTF8, CancellationToken.None);
+            var products = doc.DocumentNode.SelectSingleNode(".//b[contains(@class, 'site-stock pull-right')]");
+
+            var regexNumber = new Regex(@"[0-9]{1,3}");
+            var countS = regexNumber.Match(products.InnerText)?.Value;
+            var countN = 0;
+
+            if (!string.IsNullOrEmpty(countS)) _ = int.TryParse(countS, out countN);
+            return countN;
+        }
     }
 }
