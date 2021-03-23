@@ -17,14 +17,16 @@ namespace WebScraper9000
         private readonly IKomplettService _komplettService;
         private readonly IElkjopService _powerService;
         private readonly IProshopService _proshopService;
+        private readonly IMulticomService _multicomService;
         private readonly ItemsIWantConfiguration _options;
 
-        public WebScraper(IDiscordService discordService, IKomplettService komplettService, IElkjopService elkjopService, IProshopService proshopService ,IOptions<ItemsIWantConfiguration> options)
+        public WebScraper(IDiscordService discordService, IKomplettService komplettService, IElkjopService elkjopService, IProshopService proshopService, IMulticomService multicomService, IOptions<ItemsIWantConfiguration> options)
         {
             _discordService = discordService;
             _komplettService = komplettService;
             _powerService = elkjopService;
             _proshopService = proshopService;
+            _multicomService = multicomService;
             _options = options.Value;
         }
 
@@ -47,6 +49,8 @@ namespace WebScraper9000
                         list.AddRange(await _powerService.GetItemInStockFromPower(item.ElkjopUrl, item.Name, item.DiscordChannel));
                     if (!string.IsNullOrEmpty(item.ProshopUrl))
                         list.AddRange(await _proshopService.GetItemInStockFromProshop(item.ProshopUrl, item.Name, item.DiscordChannel));
+                    if (!string.IsNullOrEmpty(item.MulticomUrl))
+                        list.AddRange(await _multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel));
                 }
             }
 
