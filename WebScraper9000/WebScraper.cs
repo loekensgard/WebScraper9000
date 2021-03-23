@@ -21,8 +21,7 @@ namespace WebScraper9000
         private readonly IMulticomService _multicomService;
         private readonly ItemsIWantConfiguration _options;
 
-        public WebScraper(IDiscordService discordService, IKomplettService komplettService, IElkjopService elkjopService, IProshopService proshopService, IMulticomService multicomService, IOptions<ItemsIWantConfiguration> options)
-        public WebScraper(IDiscordService discordService, IKomplettService komplettService, IElkjopService elkjopService, IProshopService proshopService, IPowerService powerService ,IOptions<ItemsIWantConfiguration> options)
+        public WebScraper(IDiscordService discordService, IKomplettService komplettService, IElkjopService elkjopService, IProshopService proshopService, IPowerService powerService, IMulticomService multicomService ,IOptions<ItemsIWantConfiguration> options)
         {
             _discordService = discordService;
             _komplettService = komplettService;
@@ -49,11 +48,13 @@ namespace WebScraper9000
                     if(!string.IsNullOrEmpty(item.KomplettUrl))
                         list.AddRange(await _komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
                     if(!string.IsNullOrEmpty(item.ElkjopUrl))
-                        list.AddRange(await _powerService.GetItemInStockFromPower(item.ElkjopUrl, item.Name, item.DiscordChannel));
+                        list.AddRange(await _elkjopService.GetItemInStockFromElkjop(item.ElkjopUrl, item.Name, item.DiscordChannel));
                     if (!string.IsNullOrEmpty(item.ProshopUrl))
                         list.AddRange(await _proshopService.GetItemInStockFromProshop(item.ProshopUrl, item.Name, item.DiscordChannel));
                     if (!string.IsNullOrEmpty(item.MulticomUrl))
                         list.AddRange(await _multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel));
+                    //if (!string.IsNullOrEmpty(item.PowerUrl))
+                    //    list.AddRange(await _powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel));
                 }
             }
 
