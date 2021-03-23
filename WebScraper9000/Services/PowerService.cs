@@ -37,7 +37,7 @@ namespace WebScraper9000.Services
                 {
                     foreach(var product in body.Model.ProductWrapper.Products)
                     {
-                        if(product.StockCount > 0)
+                        if(product.StockCount > 0 && product.CategoryId == 1929)
                         {
                             list.Add(new InStockItem { Url = "https://power.no" + product.Url, Name = name, Count = product.StockCount.Value, Channel = discordChannel, Store = body.Model.SiteName });
                         }

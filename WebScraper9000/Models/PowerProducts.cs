@@ -36,6 +36,9 @@ namespace WebScraper9000.Models
         [JsonPropertyName("PreviousPriceDisclaimer")]
         public object PreviousPriceDisclaimer { get; set; }
 
+        [JsonPropertyName("CategoryId")]
+        public int? CategoryId { get; set; }
+
         //[JsonPropertyName("Price")]
         //public long? Price { get; set; }
 
@@ -83,24 +86,5 @@ namespace WebScraper9000.Models
 
         [JsonPropertyName("IsOnDemand")]
         public bool IsOnDemand { get; set; }
-    }
-
-    public partial class Category
-    {
-     
-        [JsonPropertyName("Name")]
-        public string Name { get; set; }
-
-        [JsonPropertyName("ShortName")]
-        public string ShortName { get; set; }
-
-        [JsonPropertyName("NameSlug")]
-        public string NameSlug { get; set; }
-
-        [JsonPropertyName("Url")]
-        public string Url { get; set; }
-
-        [JsonPropertyName("ChildCategories")]
-        public Category[] ChildCategories { get; set; }
     }
 }
