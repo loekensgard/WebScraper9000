@@ -14,5 +14,6 @@ namespace WebScraper9000.Configurations
         public string ElkjopUrl { get; set; }
         public string ProshopUrl { get; set; }
         public string DiscordChannel { get; set; }
+        public string PowerUrl { get; set; }
     }
 }

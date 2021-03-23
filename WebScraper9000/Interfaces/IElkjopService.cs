@@ -8,6 +8,6 @@ namespace WebScraper9000.Interfaces
 {
     public interface IElkjopService
     {
-        Task<List<InStockItem>> GetItemInStockFromPower(string url, string name, string discordChannel);
+        Task<List<InStockItem>> GetItemInStockFromElkjop(string url, string name, string discordChannel);
     }
 }

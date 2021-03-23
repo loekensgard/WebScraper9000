@@ -14,7 +14,7 @@ namespace WebScraper9000.Services
 {
     public class ElkjopService : IElkjopService
     {
-        public async Task<List<InStockItem>> GetItemInStockFromPower(string url, string name, string discordChannel)
+        public async Task<List<InStockItem>> GetItemInStockFromElkjop(string url, string name, string discordChannel)
         {
             var list = new List<InStockItem>();
 
