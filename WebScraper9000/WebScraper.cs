@@ -24,11 +24,11 @@ namespace WebScraper9000
 
         public WebScraper(
             IDiscordService discordService,
-            IKomplettService komplettService, 
-            IElkjopService elkjopService, 
-            IProshopService proshopService, 
-            IPowerService powerService, 
-            IMulticomService multicomService ,
+            IKomplettService komplettService,
+            IElkjopService elkjopService,
+            IProshopService proshopService,
+            IPowerService powerService,
+            IMulticomService multicomService,
             IOptions<ItemsIWantConfiguration> options,
             IOptions<DiscordConfiguration> discordOptions)
         {
@@ -50,7 +50,7 @@ namespace WebScraper9000
 
             var tasks = new List<Task<List<InStockItem>>>();
 
-            if(_options.Items != null)
+            if (_options.Items != null)
             {
                 try
                 {
@@ -69,7 +69,7 @@ namespace WebScraper9000
                             tasks.Add(_powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     log.LogError(e, "Failed getting status");
                     await _discordService.SendError(_discordOptions.ErrorChannel, e.Message);
@@ -83,14 +83,28 @@ namespace WebScraper9000
                 try
                 {
                     await _discordService.SendDiscordMessage(list);
-                }catch(Exception e)
+                }
+                catch (Exception e)
                 {
                     log.LogError(e, "Failed sending discord message");
+                    await _discordService.SendError(_discordOptions.ErrorChannel, e.Message);
                 }
             }
             else
             {
-                log.LogInformation("Found no items at {time}", DateTime.Now.ToString("d/MM/yy HH:mm"));
+                try
+                {
+                    foreach (var item in _options.Items)
+                    {
+                        await _discordService.SendNoItems(item.DiscordChannel, item.DiscordChannelId);
+                    }
+                    log.LogInformation("Found no items at {time}", DateTime.Now.ToString("d/MM/yy HH:mm"));
+                }
+                catch (Exception e)
+                {
+                    log.LogError(e, "Failed sending discord message");
+                    await _discordService.SendError(_discordOptions.ErrorChannel, e.Message);
+                }
             }
         }
     }

@@ -8,5 +8,6 @@ namespace WebScraper9000.Interfaces
     {
         Task SendDiscordMessage(List<InStockItem> list);
         Task SendError(string channel, string error);
+        Task SendNoItems(string channel, string channelid);
     }
 }

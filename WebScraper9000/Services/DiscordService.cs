@@ -27,7 +27,7 @@ namespace WebScraper9000.Services
 
                 var message = $"**{x}** {item.Name} på lager hos **{item.Store}**: {item.Url}";
 
-                if(!await AlreadyPosted(message, item.ChannelId))
+                if(!await AlreadyPosted(message, item.ChannelId, "10"))
                 {
                     var body = new { username = "GrabIt", content = message };
                     var response = await _httpClient.PostAsJsonAsync(item.Channel, body);
@@ -37,9 +37,9 @@ namespace WebScraper9000.Services
             }
         }
 
-        private async Task<bool> AlreadyPosted(string message, string channelId)
+        private async Task<bool> AlreadyPosted(string message, string channelId, string count)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"api/v8/channels/{channelId}/messages?limit=10");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"api/v8/channels/{channelId}/messages?limit={count}");
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
             if (response.IsSuccessStatusCode)
@@ -57,5 +57,17 @@ namespace WebScraper9000.Services
             var response = await _httpClient.PostAsJsonAsync(channel, body);
         }
 
+        public async Task SendNoItems(string channel, string channelid)
+        {
+            var message = "**Out of stock**";
+
+            if (!await AlreadyPosted(message, channelid, "1"))
+            {
+                var body = new { username = "GrabIt", content = message };
+                var response = await _httpClient.PostAsJsonAsync(channel, body);
+
+                response.EnsureSuccessStatusCode();
+            }
+        }
     }
 }
