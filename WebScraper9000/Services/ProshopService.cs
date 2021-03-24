@@ -14,7 +14,7 @@ namespace WebScraper9000.Services
 {
     public class ProshopService : IProshopService
     {
-        public async Task<List<InStockItem>> GetItemInStockFromProshop(string url, string name, string discordChannel)
+        public async Task<List<InStockItem>> GetItemInStockFromProshop(string url, string name, string discordChannel, string channelId)
         {
             var list = new List<InStockItem>();
 
@@ -43,7 +43,7 @@ namespace WebScraper9000.Services
                             var hrefValue = productLink.GetAttributeValue("href", string.Empty);
                             countN = await GetProshopCount("https://www.proshop.no" + hrefValue);
 
-                            list.Add(new InStockItem { Url = "https://www.proshop.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Proshop.no" });
+                            list.Add(new InStockItem { Url = "https://www.proshop.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Proshop.no",  ChannelId = channelId });
                         }
                     }
                 }

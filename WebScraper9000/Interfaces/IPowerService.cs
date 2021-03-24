@@ -6,6 +6,6 @@ namespace WebScraper9000.Interfaces
 {
     public interface IPowerService
     {
-        Task<List<InStockItem>> GetItemInStockFromPower(string url, string name, string discordChannel);
+        Task<List<InStockItem>> GetItemInStockFromPower(string url, string name, string discordChannel, string discordChannelId);
     }
 }

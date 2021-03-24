@@ -14,7 +14,7 @@ namespace WebScraper9000.Services
 {
     public class MulticomService : IMulticomService
     {
-        public async Task<List<InStockItem>> GetItemInStockFromMulticom(string url, string name, string discordChannel)
+        public async Task<List<InStockItem>> GetItemInStockFromMulticom(string url, string name, string discordChannel, string channelId)
         {
             var list = new List<InStockItem>();
 
@@ -40,7 +40,7 @@ namespace WebScraper9000.Services
                     if (productLink != null)
                     {
                         var hrefValue = productLink.GetAttributeValue("href", string.Empty);
-                        list.Add(new InStockItem { Url = "https://multicom.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Multicom.no" });
+                        list.Add(new InStockItem { Url = "https://multicom.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Multicom.no", ChannelId = channelId });
                     }
                 }
             }

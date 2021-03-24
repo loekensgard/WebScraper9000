@@ -7,5 +7,6 @@ namespace WebScraper9000.Interfaces
     public interface IDiscordService
     {
         Task SendDiscordMessage(List<InStockItem> list);
+        Task SendError(string channel, string error);
     }
 }

@@ -8,6 +8,6 @@ namespace WebScraper9000.Interfaces
 {
     public interface IProshopService
     {
-        Task<List<InStockItem>> GetItemInStockFromProshop(string url, string name, string discordChannel);
+        Task<List<InStockItem>> GetItemInStockFromProshop(string url, string name, string discordChannel, string discordChannelId);
     }
 }

@@ -14,7 +14,7 @@ namespace WebScraper9000.Services
 {
     public class PowerService : IPowerService
     {
-        public async Task<List<InStockItem>> GetItemInStockFromPower(string url, string name, string discordChannel)
+        public async Task<List<InStockItem>> GetItemInStockFromPower(string url, string name, string discordChannel, string channelId)
         {
             var list = new List<InStockItem>();
 
@@ -39,7 +39,7 @@ namespace WebScraper9000.Services
                     {
                         if(product.StockCount > 0 && product.CategoryId == 1929)
                         {
-                            list.Add(new InStockItem { Url = "https://power.no" + product.Url, Name = name, Count = product.StockCount.Value, Channel = discordChannel, Store = body.Model.SiteName });
+                            list.Add(new InStockItem { Url = "https://power.no" + product.Url, Name = name, Count = product.StockCount.Value, Channel = discordChannel, Store = body.Model.SiteName, ChannelId = channelId });
                         }
                     }
                 }

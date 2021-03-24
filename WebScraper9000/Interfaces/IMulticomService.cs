@@ -6,6 +6,6 @@ namespace WebScraper9000.Interfaces
 {
     public interface IMulticomService
     {
-        Task<List<InStockItem>> GetItemInStockFromMulticom(string url, string name, string discordChannel);
+        Task<List<InStockItem>> GetItemInStockFromMulticom(string url, string name, string discordChannel, string discordChannelId);
     }
 }

@@ -15,6 +15,7 @@ namespace WebScraper9000.Configurations
         public string ProshopUrl { get; set; }
         public string MulticomUrl { get; set; }
         public string DiscordChannel { get; set; }
+        public string DiscordChannelId { get; set; }
         public string PowerUrl { get; set; }
     }
 }

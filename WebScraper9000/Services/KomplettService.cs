@@ -14,7 +14,7 @@ namespace WebScraper9000.Services
 {
     public class KomplettService : IKomplettService
     {
-        public async Task<List<InStockItem>> GetItemInStockFromKomplett(string url, string name, string discordChannel)
+        public async Task<List<InStockItem>> GetItemInStockFromKomplett(string url, string name, string discordChannel, string channelId)
         {
             var list = new List<InStockItem>();
 
@@ -42,7 +42,7 @@ namespace WebScraper9000.Services
                         if (productLink != null)
                         {
                             var hrefValue = productLink.GetAttributeValue("href", string.Empty);
-                            list.Add(new InStockItem { Url = "https://komplett.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Komplett.no" });
+                            list.Add(new InStockItem { Url = "https://komplett.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Komplett.no", ChannelId = channelId });
                         }
                     }
                 }

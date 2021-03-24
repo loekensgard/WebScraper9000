@@ -6,6 +6,6 @@ namespace WebScraper9000.Interfaces
 {
     public interface IKomplettService
     {
-        Task<List<InStockItem>> GetItemInStockFromKomplett(string url, string name, string discordChannel);
+        Task<List<InStockItem>> GetItemInStockFromKomplett(string url, string name, string discordChannel, string discordChannelId);
     }
 }

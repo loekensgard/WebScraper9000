@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
+using System.Net.Http.Headers;
 using WebScraper9000.Configurations;
 using WebScraper9000.Interfaces;
 using WebScraper9000.Services;
@@ -24,9 +25,18 @@ namespace WebScraper9000
                 .Build();
 
             builder.Services.Configure<ItemsIWantConfiguration>(options => localConfig.GetSection("ItemsIWant").Bind(options));
+            builder.Services.Configure<DiscordConfiguration>(options => localConfig.GetSection("Discord").Bind(options));
 
+            builder.Services.AddTransient<HttpResponseService>();
             builder.Services.AddHttpClient<IDiscordService, DiscordService>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://discord.com/"));
+                        .ConfigureHttpClient(c =>
+                        {
+                            c.BaseAddress = new Uri("https://discord.com/");
+                            c.DefaultRequestHeaders.Authorization =
+                                new AuthenticationHeaderValue("Bot", localConfig.GetSection("Discord")["Token"]);
+                            c.DefaultRequestHeaders.Add("User-Agent", "DiscordBot C#");
+                        }
+                        );
             builder.Services.AddSingleton<IKomplettService, KomplettService>();
             builder.Services.AddSingleton<IElkjopService, ElkjopService>();
             builder.Services.AddSingleton<IProshopService, ProshopService>();

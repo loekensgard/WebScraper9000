@@ -19,9 +19,18 @@ namespace WebScraper9000
         private readonly IProshopService _proshopService;
         private readonly IPowerService _powerService;
         private readonly IMulticomService _multicomService;
+        private readonly DiscordConfiguration _discordOptions;
         private readonly ItemsIWantConfiguration _options;
 
-        public WebScraper(IDiscordService discordService, IKomplettService komplettService, IElkjopService elkjopService, IProshopService proshopService, IPowerService powerService, IMulticomService multicomService ,IOptions<ItemsIWantConfiguration> options)
+        public WebScraper(
+            IDiscordService discordService,
+            IKomplettService komplettService, 
+            IElkjopService elkjopService, 
+            IProshopService proshopService, 
+            IPowerService powerService, 
+            IMulticomService multicomService ,
+            IOptions<ItemsIWantConfiguration> options,
+            IOptions<DiscordConfiguration> discordOptions)
         {
             _discordService = discordService;
             _komplettService = komplettService;
@@ -29,6 +38,7 @@ namespace WebScraper9000
             _proshopService = proshopService;
             _powerService = powerService;
             _multicomService = multicomService;
+            _discordOptions = discordOptions.Value;
             _options = options.Value;
         }
 
@@ -42,19 +52,27 @@ namespace WebScraper9000
 
             if(_options.Items != null)
             {
-                log.LogInformation("Checking {count} items", _options.Items.Count);
-                foreach (var item in _options.Items)
+                try
                 {
-                    if(!string.IsNullOrEmpty(item.KomplettUrl))
-                        tasks.Add(_komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel));
-                    if(!string.IsNullOrEmpty(item.ElkjopUrl))
-                        tasks.Add(_elkjopService.GetItemInStockFromElkjop(item.ElkjopUrl, item.Name, item.DiscordChannel));
-                    if (!string.IsNullOrEmpty(item.ProshopUrl))
-                        tasks.Add(_proshopService.GetItemInStockFromProshop(item.ProshopUrl, item.Name, item.DiscordChannel));
-                    if (!string.IsNullOrEmpty(item.MulticomUrl))
-                        tasks.Add(_multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel));
-                    if (!string.IsNullOrEmpty(item.PowerUrl))
-                        tasks.Add(_powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel));
+                    log.LogInformation("Checking {count} items", _options.Items.Count);
+                    foreach (var item in _options.Items)
+                    {
+                        if (!string.IsNullOrEmpty(item.KomplettUrl))
+                            tasks.Add(_komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
+                        if (!string.IsNullOrEmpty(item.ElkjopUrl))
+                            tasks.Add(_elkjopService.GetItemInStockFromElkjop(item.ElkjopUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
+                        if (!string.IsNullOrEmpty(item.ProshopUrl))
+                            tasks.Add(_proshopService.GetItemInStockFromProshop(item.ProshopUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
+                        if (!string.IsNullOrEmpty(item.MulticomUrl))
+                            tasks.Add(_multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
+                        if (!string.IsNullOrEmpty(item.PowerUrl))
+                            tasks.Add(_powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
+                    }
+                }
+                catch(Exception e)
+                {
+                    log.LogError(e, "Failed getting status");
+                    await _discordService.SendError(_discordOptions.ErrorChannel, e.Message);
                 }
             }
 

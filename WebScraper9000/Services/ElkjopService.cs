@@ -14,7 +14,7 @@ namespace WebScraper9000.Services
 {
     public class ElkjopService : IElkjopService
     {
-        public async Task<List<InStockItem>> GetItemInStockFromElkjop(string url, string name, string discordChannel)
+        public async Task<List<InStockItem>> GetItemInStockFromElkjop(string url, string name, string discordChannel, string channelId)
         {
             var list = new List<InStockItem>();
 
@@ -39,7 +39,7 @@ namespace WebScraper9000.Services
                     if (productLink != null)
                     {
                         var hrefValue = productLink.GetAttributeValue("href", string.Empty);
-                        list.Add(new InStockItem { Url = hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Elkjop.no" });
+                        list.Add(new InStockItem { Url = hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Elkjop.no", ChannelId = channelId });
                     }
                 }
             }

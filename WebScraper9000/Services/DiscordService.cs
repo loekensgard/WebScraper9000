@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebScraper9000.Interfaces;
@@ -10,10 +10,12 @@ namespace WebScraper9000.Services
     public class DiscordService : IDiscordService
     {
         private readonly HttpClient _httpClient;
+        private readonly HttpResponseService _httpResponseService;
 
-        public DiscordService(HttpClient httpClient)
+        public DiscordService(HttpClient httpClient, HttpResponseService httpResponseService)
         {
             _httpClient = httpClient;
+            _httpResponseService = httpResponseService;
         }
         public async Task SendDiscordMessage(List<InStockItem> list)
         {
@@ -23,11 +25,36 @@ namespace WebScraper9000.Services
                 if (item.Count != 0)
                     x = item.Count.ToString();
 
-                var body = new { username = "GrabIt", content = $"**{x}** {item.Name} på lager hos **{item.Store}**: {item.Url}" };
-                var response = await _httpClient.PostAsJsonAsync(item.Channel, body);
+                var message = $"**{x}** {item.Name} på lager hos **{item.Store}**: {item.Url}";
 
-                response.EnsureSuccessStatusCode();
+                if(!await AlreadyPosted(message, item.ChannelId))
+                {
+                    var body = new { username = "GrabIt", content = message };
+                    var response = await _httpClient.PostAsJsonAsync(item.Channel, body);
+
+                    response.EnsureSuccessStatusCode();
+                }
             }
+        }
+
+        private async Task<bool> AlreadyPosted(string message, string channelId)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"api/v8/channels/{channelId}/messages?limit=10");
+            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var messages = await _httpResponseService.DeserializeJsonFromStream<List<DiscordMessage>>(response);
+                if (messages.Any(x => x.Content == message)) return true;
+            }
+
+            return false;
+        }
+
+        public async Task SendError(string channel, string error)
+        {
+            var body = new { username = "WebScraper9000", content = error };
+            var response = await _httpClient.PostAsJsonAsync(channel, body);
         }
 
     }
