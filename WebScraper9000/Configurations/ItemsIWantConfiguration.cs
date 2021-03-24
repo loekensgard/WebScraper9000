@@ -17,5 +17,6 @@ namespace WebScraper9000.Configurations
         public string DiscordChannel { get; set; }
         public string DiscordChannelId { get; set; }
         public string PowerUrl { get; set; }
+        public string NetonnetUrl { get;  set; }
     }
 }

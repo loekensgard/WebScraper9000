@@ -42,6 +42,7 @@ namespace WebScraper9000
             builder.Services.AddSingleton<IProshopService, ProshopService>();
             builder.Services.AddSingleton<IPowerService, PowerService>();
             builder.Services.AddSingleton<IMulticomService, MulticomService>();
+            builder.Services.AddSingleton<INetonnetService, NetonnetService>();
         }
 
         private string GetBasePath(IFunctionsHostBuilder builder)

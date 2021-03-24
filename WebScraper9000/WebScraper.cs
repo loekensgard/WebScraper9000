@@ -19,6 +19,7 @@ namespace WebScraper9000
         private readonly IProshopService _proshopService;
         private readonly IPowerService _powerService;
         private readonly IMulticomService _multicomService;
+        private readonly INetonnetService _netonnetService;
         private readonly DiscordConfiguration _discordOptions;
         private readonly ItemsIWantConfiguration _options;
 
@@ -29,6 +30,7 @@ namespace WebScraper9000
             IProshopService proshopService,
             IPowerService powerService,
             IMulticomService multicomService,
+            INetonnetService netonnetService,
             IOptions<ItemsIWantConfiguration> options,
             IOptions<DiscordConfiguration> discordOptions)
         {
@@ -38,6 +40,7 @@ namespace WebScraper9000
             _proshopService = proshopService;
             _powerService = powerService;
             _multicomService = multicomService;
+            _netonnetService = netonnetService;
             _discordOptions = discordOptions.Value;
             _options = options.Value;
         }
@@ -67,6 +70,8 @@ namespace WebScraper9000
                             tasks.Add(_multicomService.GetItemInStockFromMulticom(item.MulticomUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
                         if (!string.IsNullOrEmpty(item.PowerUrl))
                             tasks.Add(_powerService.GetItemInStockFromPower(item.PowerUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
+                        if (!string.IsNullOrEmpty(item.NetonnetUrl))
+                            tasks.Add(_netonnetService.GetItemInStockFromNetonnet(item.NetonnetUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
                     }
                 }
                 catch (Exception e)
