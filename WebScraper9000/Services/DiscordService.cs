@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using WebScraper9000.Exceptions;
 using WebScraper9000.Interfaces;
 using WebScraper9000.Models;
 
@@ -27,7 +29,18 @@ namespace WebScraper9000.Services
 
                 var message = $"**{x}** {item.Name} på lager hos **{item.Store}**: {item.Url}";
 
-                if(!await AlreadyPosted(message, item.ChannelId, "10"))
+                bool check = false;
+                try
+                {
+                    check = await AlreadyPosted(message, item.ChannelId, "10");
+                }
+                catch(Exception e)
+                {
+                    if (e is IdkException)
+                        check = false;
+                }
+
+                if(!check)
                 {
                     var body = new { username = "GrabIt", content = message };
                     var response = await _httpClient.PostAsJsonAsync(item.Channel, body);
@@ -46,6 +59,9 @@ namespace WebScraper9000.Services
             {
                 var messages = await _httpResponseService.DeserializeJsonFromStream<List<DiscordMessage>>(response);
                 if (messages.Any(x => x.Content == message)) return true;
+            }else
+            {
+                throw new IdkException();
             }
 
             return false;
@@ -61,7 +77,18 @@ namespace WebScraper9000.Services
         {
             var message = "**Out of stock**";
 
-            if (!await AlreadyPosted(message, channelid, "1"))
+            bool check = true;
+            try
+            {
+                check = await AlreadyPosted(message, channelid, "1");
+            }
+            catch(Exception e)
+            {
+                if (e is IdkException)
+                    check = true;
+            }
+
+            if (!check)
             {
                 var body = new { username = "GrabIt", content = message };
                 var response = await _httpClient.PostAsJsonAsync(channel, body);
