@@ -84,8 +84,38 @@ namespace WebScraper9000
                 }
             }
 
-            var list = (await Task.WhenAll(tasks)).SelectMany(result => result).ToList();
+            var list = (await Task.WhenAll(tasks)).SelectMany(result => result).GroupBy(x => x.Name);
+            var NotEmpty = new List<string>();
 
+            foreach (var group in list)
+            {
+                NotEmpty.Add(group.FirstOrDefault().Name);
+                await AlertDiscord(log, group.ToList());
+            }
+
+            var outOfStock = _options.Items.Where(x => NotEmpty.Any(c => c != x.Name));
+            await SendOutOfStock(log, outOfStock);
+        }
+
+        private async Task SendOutOfStock(ILogger log, IEnumerable<ItemsIWant> outOfStock)
+        {
+            foreach (var item in outOfStock)
+            {
+                try
+                {
+                    await _discordService.SendNoItems(item.DiscordChannel, item.DiscordChannelId);
+                    log.LogInformation("Found no items at {time}", DateTime.Now.ToString("d/MM/yy HH:mm"));
+                }
+                catch (Exception e)
+                {
+                    log.LogError(e, "Failed sending discord message");
+                    await _discordService.SendError(_discordOptions.ErrorChannel, e.Message);
+                }
+            }
+        }
+
+        private async Task AlertDiscord(ILogger log, List<InStockItem> list)
+        {
             if (list.Any())
             {
                 try
@@ -94,23 +124,7 @@ namespace WebScraper9000
                 }
                 catch (Exception e)
                 {
-                    log.LogError(e, "Failed sending discord message");
-                    await _discordService.SendError(_discordOptions.ErrorChannel, e.Message);
-                }
-            }
-            else
-            {
-                try
-                {
-                    foreach (var item in _options.Items)
-                    {
-                        await _discordService.SendNoItems(item.DiscordChannel, item.DiscordChannelId);
-                    }
-                    log.LogInformation("Found no items at {time}", DateTime.Now.ToString("d/MM/yy HH:mm"));
-                }
-                catch (Exception e)
-                {
-                    log.LogError(e, "Failed sending discord message");
+                    log.LogError(e, "Failed sending discord message for {item}", list.FirstOrDefault().Name);
                     await _discordService.SendError(_discordOptions.ErrorChannel, e.Message);
                 }
             }
