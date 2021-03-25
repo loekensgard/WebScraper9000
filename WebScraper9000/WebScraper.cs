@@ -60,6 +60,9 @@ namespace WebScraper9000
                     log.LogInformation("Checking {count} items", _options.Items.Count);
                     foreach (var item in _options.Items)
                     {
+                        var linked = !string.IsNullOrEmpty(item.DiscordChannel);
+                        log.LogInformation("Checking {name} and discord channel is {linked} with {id}", item.Name, linked, item.DiscordChannelId);
+
                         if (!string.IsNullOrEmpty(item.KomplettUrl))
                             tasks.Add(_komplettService.GetItemInStockFromKomplett(item.KomplettUrl, item.Name, item.DiscordChannel, item.DiscordChannelId));
                         if (!string.IsNullOrEmpty(item.ElkjopUrl))
