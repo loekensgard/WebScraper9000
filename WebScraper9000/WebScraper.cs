@@ -104,7 +104,7 @@ namespace WebScraper9000
                 try
                 {
                     await _discordService.SendNoItems(item.DiscordChannel, item.DiscordChannelId);
-                    log.LogInformation("Found no items at {time}", DateTime.Now.ToString("d/MM/yy HH:mm"));
+                    log.LogInformation("Found no items for {item} at {time}",item.Name, DateTime.Now.ToString("d/MM/yy HH:mm"));
                 }
                 catch (Exception e)
                 {
