@@ -85,7 +85,7 @@ namespace WebScraper9000
             }
 
             var list = (await Task.WhenAll(tasks)).SelectMany(result => result).GroupBy(x => x.Name);
-            var NotEmpty = new List<string>();
+            var NotEmpty = new List<string>() { "Empty" };
 
             foreach (var group in list)
             {
