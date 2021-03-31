@@ -7,23 +7,29 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using WebScraper9000.Configurations;
 using WebScraper9000.Interfaces;
 using WebScraper9000.Models;
 
 namespace WebScraper9000.Services
 {
-    public class KomplettService : IKomplettService
+    public class KomplettService : IStoreService
     {
-        public async Task<List<InStockItem>> GetItemInStockFromKomplett(string url, string name, string discordChannel, string channelId)
+        public async Task<IEnumerable<InStockItem>> GetItemInStock(ItemsIWant item)
         {
             var list = new List<InStockItem>();
 
+            if (string.IsNullOrEmpty(item.KomplettUrl))
+            {
+                return list;
+            }
+            
             var webCrawler = new HtmlWeb()
             {
                 AutoDetectEncoding = false,
                 OverrideEncoding = Encoding.UTF8
             };
-            var doc = await webCrawler.LoadFromWebAsync(url, Encoding.UTF8, CancellationToken.None);
+            var doc = await webCrawler.LoadFromWebAsync(item.KomplettUrl, Encoding.UTF8, CancellationToken.None);
 
             var products = doc.DocumentNode.Descendants().Where(x => x.HasClass("product-list-item")).ToList();
 
@@ -42,7 +48,7 @@ namespace WebScraper9000.Services
                         if (productLink != null)
                         {
                             var hrefValue = productLink.GetAttributeValue("href", string.Empty);
-                            list.Add(new InStockItem { Url = "https://komplett.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Komplett.no", ChannelId = channelId });
+                            list.Add(new InStockItem { Url = "https://komplett.no" + hrefValue, Name = item.Name, Count = countN, Channel = item.DiscordChannel, Store = "Komplett.no", ChannelId = item.DiscordChannelId });
                         }
                     }
                 }

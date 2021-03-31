@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using WebScraper9000.Configurations;
 using WebScraper9000.Exceptions;
 using WebScraper9000.Interfaces;
 using WebScraper9000.Models;
@@ -11,15 +12,19 @@ namespace WebScraper9000.Services
 {
     public class DiscordService : IDiscordService
     {
+        private const string OUT_OF_STOCK_MESSAGE = "**Out of stock**";
         private readonly HttpClient _httpClient;
         private readonly HttpResponseService _httpResponseService;
+        private IDictionary<string, IEnumerable<DiscordMessage>> discordMessages;
 
         public DiscordService(HttpClient httpClient, HttpResponseService httpResponseService)
         {
             _httpClient = httpClient;
             _httpResponseService = httpResponseService;
+            discordMessages = new Dictionary<string, IEnumerable<DiscordMessage>>();
         }
-        public async Task SendDiscordMessage(List<InStockItem> list)
+
+        public async Task SendDiscordMessage(IEnumerable<InStockItem> list)
         {
             foreach (var item in list)
             {
@@ -29,18 +34,14 @@ namespace WebScraper9000.Services
 
                 var message = $"**{x}** {item.Name} på lager hos **{item.Store}**: {item.Url}";
 
-                bool check = false;
-                try
-                {
-                    check = await AlreadyPosted(message, item.ChannelId, "10");
-                }
-                catch(Exception e)
-                {
-                    if (e is IdkException)
-                        check = false;
-                }
+                bool alreadyPosted = false;
 
-                if(!check)
+                if (discordMessages.TryGetValue(item.ChannelId, out var messages))
+				{
+                    alreadyPosted = messages.Any(m => m.Content == message) && messages.First().Content != OUT_OF_STOCK_MESSAGE;
+				}
+
+                if(!alreadyPosted)
                 {
                     var body = new { username = "GrabIt", content = message };
                     var response = await _httpClient.PostAsJsonAsync(item.Channel, body);
@@ -50,51 +51,49 @@ namespace WebScraper9000.Services
             }
         }
 
-        private async Task<bool> AlreadyPosted(string message, string channelId, string count)
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"api/v8/channels/{channelId}/messages?limit={count}");
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var messages = await _httpResponseService.DeserializeJsonFromStream<List<DiscordMessage>>(response);
-                if (messages.Any(x => x.Content == message)) return true;
-            }else
-            {
-                throw new IdkException();
-            }
-
-            return false;
-        }
-
         public async Task SendError(string channel, string error)
         {
             var body = new { username = "WebScraper9000", content = error };
             var response = await _httpClient.PostAsJsonAsync(channel, body);
         }
 
-        public async Task SendNoItems(string channel, string channelid)
+        public async Task SendNoItems(string channel, string channelId)
         {
-            var message = "**Out of stock**";
+            bool alreadyPosted = true;
 
-            bool check = true;
-            try
+            if (discordMessages.TryGetValue(channelId, out var messages))
             {
-                check = await AlreadyPosted(message, channelid, "1");
-            }
-            catch(Exception e)
-            {
-                if (e is IdkException)
-                    check = true;
+                alreadyPosted = messages.First().Content == OUT_OF_STOCK_MESSAGE;
             }
 
-            if (!check)
+            if (!alreadyPosted)
             {
-                var body = new { username = "GrabIt", content = message };
+                var body = new { username = "GrabIt", content = OUT_OF_STOCK_MESSAGE };
                 var response = await _httpClient.PostAsJsonAsync(channel, body);
 
                 response.EnsureSuccessStatusCode();
             }
         }
-    }
+
+		public async Task UpdateDiscordMessages(IEnumerable<ItemsIWant> items)
+		{            
+            foreach (var item in items)
+			{
+                try
+                {
+                    discordMessages.Add(item.DiscordChannelId, await GetChannelMessages(item.DiscordChannelId));
+                }
+                catch (Exception)
+				{
+                    // idk
+				}
+			}
+		}
+
+        private async Task<IEnumerable<DiscordMessage>> GetChannelMessages(string channelId)
+		{
+            var response = await _httpClient.GetAsync($"api/v8/channels/{channelId}/messages?limit={10}");
+            return await response.Content.ReadAsAsync<IEnumerable<DiscordMessage>>();
+        }
+	}
 }

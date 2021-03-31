@@ -7,23 +7,29 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using WebScraper9000.Configurations;
 using WebScraper9000.Interfaces;
 using WebScraper9000.Models;
 
 namespace WebScraper9000.Services
 {
-    public class ElkjopService : IElkjopService
+    public class ElkjopService : IStoreService
     {
-        public async Task<List<InStockItem>> GetItemInStockFromElkjop(string url, string name, string discordChannel, string channelId)
+        public async Task<IEnumerable<InStockItem>> GetItemInStock(ItemsIWant item)
         {
             var list = new List<InStockItem>();
+
+            if (string.IsNullOrEmpty(item.ElkjopUrl))
+			{
+                return list;
+			}
 
             var webCrawler = new HtmlWeb()
             {
                 AutoDetectEncoding = false,
                 OverrideEncoding = Encoding.UTF8
             };
-            var doc = await webCrawler.LoadFromWebAsync(url, Encoding.UTF8, CancellationToken.None);
+            var doc = await webCrawler.LoadFromWebAsync(item.ElkjopUrl, Encoding.UTF8, CancellationToken.None);
 
             var products = doc.DocumentNode.Descendants().Where(x => x.HasClass("mini-product")).ToList();
 
@@ -39,7 +45,7 @@ namespace WebScraper9000.Services
                     if (productLink != null)
                     {
                         var hrefValue = productLink.GetAttributeValue("href", string.Empty);
-                        list.Add(new InStockItem { Url = hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Elkjop.no", ChannelId = channelId });
+                        list.Add(new InStockItem { Url = hrefValue, Name = item.Name, Count = countN, Channel = item.DiscordChannel, Store = "Elkjop.no", ChannelId = item.DiscordChannelId });
                     }
                 }
             }

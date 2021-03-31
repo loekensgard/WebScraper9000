@@ -7,23 +7,29 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using WebScraper9000.Configurations;
 using WebScraper9000.Interfaces;
 using WebScraper9000.Models;
 
 namespace WebScraper9000.Services
 {
-    public class ProshopService : IProshopService
+    public class ProshopService : IStoreService
     {
-        public async Task<List<InStockItem>> GetItemInStockFromProshop(string url, string name, string discordChannel, string channelId)
+        public async Task<IEnumerable<InStockItem>> GetItemInStock(ItemsIWant item)
         {
             var list = new List<InStockItem>();
+
+            if (string.IsNullOrEmpty(item.ProshopUrl))
+            {
+                return list;
+            }
 
             var webCrawler = new HtmlWeb()
             {
                 AutoDetectEncoding = false,
                 OverrideEncoding = Encoding.UTF8
             };
-            var doc = await webCrawler.LoadFromWebAsync(url, Encoding.UTF8, CancellationToken.None);
+            var doc = await webCrawler.LoadFromWebAsync(item.ProshopUrl, Encoding.UTF8, CancellationToken.None);
 
             var products = doc.DocumentNode.SelectNodes("//li[contains(@class, 'toggle')]").ToList();
 
@@ -43,7 +49,7 @@ namespace WebScraper9000.Services
                             var hrefValue = productLink.GetAttributeValue("href", string.Empty);
                             countN = await GetProshopCount("https://www.proshop.no" + hrefValue);
 
-                            list.Add(new InStockItem { Url = "https://www.proshop.no" + hrefValue, Name = name, Count = countN, Channel = discordChannel, Store = "Proshop.no",  ChannelId = channelId });
+                            list.Add(new InStockItem { Url = "https://www.proshop.no" + hrefValue, Name = item.Name, Count = countN, Channel = item.DiscordChannel, Store = "Proshop.no",  ChannelId = item.DiscordChannelId });
                         }
                     }
                 }

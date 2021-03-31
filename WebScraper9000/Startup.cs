@@ -37,12 +37,12 @@ namespace WebScraper9000
                             c.DefaultRequestHeaders.Add("User-Agent", "DiscordBot C#");
                         }
                         );
-            builder.Services.AddSingleton<IKomplettService, KomplettService>();
-            builder.Services.AddSingleton<IElkjopService, ElkjopService>();
-            builder.Services.AddSingleton<IProshopService, ProshopService>();
-            builder.Services.AddSingleton<IPowerService, PowerService>();
-            builder.Services.AddSingleton<IMulticomService, MulticomService>();
-            builder.Services.AddSingleton<INetonnetService, NetonnetService>();
+            builder.Services.AddSingleton<IStoreService, KomplettService>();
+            builder.Services.AddSingleton<IStoreService, ElkjopService>();
+            builder.Services.AddSingleton<IStoreService, ProshopService>();
+            builder.Services.AddSingleton<IStoreService, PowerService>();
+            builder.Services.AddSingleton<IStoreService, MulticomService>();
+            builder.Services.AddSingleton<IStoreService, NetonnetService>();
         }
 
         private string GetBasePath(IFunctionsHostBuilder builder)
