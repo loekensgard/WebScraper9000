@@ -43,6 +43,7 @@ namespace WebScraper9000
             builder.Services.AddSingleton<IStoreService, PowerService>();
             builder.Services.AddSingleton<IStoreService, MulticomService>();
             builder.Services.AddSingleton<IStoreService, NetonnetService>();
+            builder.Services.AddSingleton<IStoreService, PreBuiltKomplett>();
         }
 
         private string GetBasePath(IFunctionsHostBuilder builder)
