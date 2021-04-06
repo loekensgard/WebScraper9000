@@ -37,11 +37,11 @@ namespace WebScraper9000.Services
                 bool alreadyPosted = false;
 
                 if (discordMessages.TryGetValue(item.ChannelId, out var messages))
-				{
+                {
                     alreadyPosted = messages.Any(m => m.Content == message) && messages.First().Content != OUT_OF_STOCK_MESSAGE;
-				}
+                }
 
-                if(!alreadyPosted)
+                if (!alreadyPosted)
                 {
                     var body = new { username = "GrabIt", content = message };
                     var response = await _httpClient.PostAsJsonAsync(item.Channel, body);
@@ -63,7 +63,10 @@ namespace WebScraper9000.Services
 
             if (discordMessages.TryGetValue(channelId, out var messages))
             {
-                alreadyPosted = messages.First().Content == OUT_OF_STOCK_MESSAGE;
+                if (!messages.Any())
+                    alreadyPosted = false;
+                else
+                    alreadyPosted = messages.First().Content == OUT_OF_STOCK_MESSAGE;
             }
 
             if (!alreadyPosted)
@@ -75,25 +78,25 @@ namespace WebScraper9000.Services
             }
         }
 
-		public async Task UpdateDiscordMessages(IEnumerable<ItemsIWant> items)
-		{            
+        public async Task UpdateDiscordMessages(IEnumerable<ItemsIWant> items)
+        {
             foreach (var item in items)
-			{
+            {
                 try
                 {
                     discordMessages.Add(item.DiscordChannelId, await GetChannelMessages(item.DiscordChannelId));
                 }
                 catch (Exception)
-				{
+                {
                     // idk
-				}
-			}
-		}
+                }
+            }
+        }
 
         private async Task<IEnumerable<DiscordMessage>> GetChannelMessages(string channelId)
-		{
+        {
             var response = await _httpClient.GetAsync($"api/v8/channels/{channelId}/messages?limit={10}");
             return await response.Content.ReadAsAsync<IEnumerable<DiscordMessage>>();
         }
-	}
+    }
 }
