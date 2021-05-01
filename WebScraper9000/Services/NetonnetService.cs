@@ -30,7 +30,7 @@ namespace WebScraper9000.Services
             };
             var doc = await webCrawler.LoadFromWebAsync(item.NetonnetUrl, Encoding.UTF8, CancellationToken.None);
 
-            var products = doc.DocumentNode.SelectNodes("//div[contains(concat(' ', @class, ' '), ' panel panel-default clearfix ')]");
+            var products = doc.DocumentNode.SelectNodes("//div[contains(concat(' ', @class, ' '), ' cProductItem col-xs-12 col-sm-4 col-md-6 col-lg-4 product ')]");
 
             foreach (var product in products)
             {
