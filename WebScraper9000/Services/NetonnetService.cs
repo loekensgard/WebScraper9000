@@ -30,24 +30,26 @@ namespace WebScraper9000.Services
             };
             var doc = await webCrawler.LoadFromWebAsync(item.NetonnetUrl, Encoding.UTF8, CancellationToken.None);
 
-            var products = doc.DocumentNode.SelectNodes("//div[contains(concat(' ', @class, ' '), ' cProductItem col-xs-12 col-sm-4 col-md-6 col-lg-4 product ')]");
+            var products = doc.DocumentNode.SelectNodes("//div[contains(concat(' ', @class, ' '), 'cProductItem')]");
 
-            foreach (var product in products)
+            if(products != null)
             {
-                var inStock = product.SelectSingleNode(".//span[contains(@class, 'stockStatusInStock')]");
-
-                if (inStock != null)
+                foreach (var product in products)
                 {
+                    var inStock = product.SelectSingleNode(".//span[contains(@class, 'stockStatusInStock')]");
 
-                    var productLink = product.SelectSingleNode(".//a");
-                    if (productLink != null)
+                    if (inStock != null)
                     {
-                        var hrefValue = productLink.GetAttributeValue("href", string.Empty);
-                        list.Add(new InStockItem { Url = "https://netonnet.no" + hrefValue, Name = item.Name, Count = 0, Channel = item.DiscordChannel, Store = "NetOnNet.no", ChannelId = item.DiscordChannelId });
+
+                        var productLink = product.SelectSingleNode(".//a");
+                        if (productLink != null)
+                        {
+                            var hrefValue = productLink.GetAttributeValue("href", string.Empty);
+                            list.Add(new InStockItem { Url = "https://netonnet.no" + hrefValue, Name = item.Name, Count = 0, Channel = item.DiscordChannel, Store = "NetOnNet.no", ChannelId = item.DiscordChannelId });
+                        }
                     }
                 }
             }
-
             return list;
         }
     }

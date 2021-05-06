@@ -45,8 +45,12 @@ namespace WebScraper9000.Services
                     var productLink = product.SelectSingleNode(".//a");
                     if (productLink != null)
                     {
+
+                        var itemCheck = item.Name.Split(' ').Last();
                         var hrefValue = productLink.GetAttributeValue("href", string.Empty);
-                        list.Add(new InStockItem { Url = "https://multicom.no" + hrefValue, Name = item.Name, Count = countN, Channel = item.DiscordChannel, Store = "Multicom.no", ChannelId = item.DiscordChannelId });
+                        if (hrefValue.Contains(itemCheck)){
+                            list.Add(new InStockItem { Url = "https://multicom.no" + hrefValue, Name = item.Name, Count = countN, Channel = item.DiscordChannel, Store = "Multicom.no", ChannelId = item.DiscordChannelId });
+                        }
                     }
                 }
             }
